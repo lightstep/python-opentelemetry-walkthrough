@@ -1,0 +1,58 @@
+<html lang="en-US">
+  <head>
+    <meta charset="ISO-8859-1">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Donuts as a Service</title>
+    <link rel="shortcut icon" href="/img/donut-sprinkles.png">
+    <script src="{{ url_for('static', filename='js/jquery-3.2.0.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/opentracing-browser.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/lightstep-tracer.js') }}"></script>
+    <script src="{{ url_for('static', filename='config.js') }}"></script>
+    <script src="{{ url_for('static', filename='client.js') }}"></script>
+    <script src="{{ url_for('static', filename='order.js') }}"></script>
+    <style> body {background-image:url("{{ url_for('static', filename='img/donuts.png') }}")}</style>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}"/>
+  </head>
+  <body>
+    <h1 id="title">Donuts as a Service</h1>
+    <h2>Menu</h2>
+    <div id="menu">
+      <img class="donut-btn btn"
+         src="{{ url_for('static', filename='img/donut-glazed.png') }}"
+         data-flavor="glazed">
+      <img class="donut-btn btn"
+         src="{{ url_for('static', filename='img/donut-cinn.jpg') }}"
+         data-flavor="cinnamon">
+      <img class="donut-btn btn"
+         src="{{ url_for('static', filename='img/donut-old-fash.jpg') }}"
+         data-flavor="old-fashioned">
+      <img class="donut-btn btn"
+         src="{{ url_for('static', filename='img/donut-choc.jpg') }}"
+         data-flavor="chocolate">
+      <img class="donut-btn btn"
+         src="{{ url_for('static', filename='img/donut-sprinkles.png') }}"
+         data-flavor="sprinkles">
+      <img class="donut-btn btn"
+         src="{{ url_for('static', filename='img/donut-jelly.jpg') }}"
+         data-flavor="jelly">
+    </div> 
+    <div id="shopping-cart" class="box">
+      <h2>Cart</h2>
+      <div id="shopping-cart-items"></div>
+      <div id="order-btn" class="btn">Order</div>
+    </div>
+    <div id="order-status" class="box">
+      <h2>Order Status</h2>
+      <div id="wait-time"></div>
+      <div id="status-update"></div>
+    </div>
+    <div id="order-loading" class="box">
+      <h2>Order Status</h2>
+      <div class="bubblingG">
+      	<span id="bubblingG_1"></span>
+      	<span id="bubblingG_2"></span>
+      	<span id="bubblingG_3"></span>
+      </div>
+    </div>
+  </body>
+</html>

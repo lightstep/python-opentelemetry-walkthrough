@@ -1,0 +1,14 @@
+activate/*
+env/*
+docs/_build/*
+build/*
+lightstep.egg-info/*
+dist/*
+.tox/*
+**.pyc
+.cache/*
+.DS_Store
+**/.DS_Store
+.idea
+.pytest_cache/
+.python-version
