@@ -3,7 +3,7 @@ MicroDonuts: An OpenTelemetry Walkthrough
 =========================================
 
 
-Welcome to MicroDonuts! This is a sample application and OpenTracing
+Welcome to MicroDonuts! This is a sample application and OpenTelemetry
 walkthrough, written in Python.
 
 OpenTelemetry is a vendor-neutral, open standard for distributed tracing. To
@@ -11,7 +11,7 @@ learn more, check out http://opentelemetry.io, and try the walkthrough below!
 
 **Note that there are two git branches of note here.**
 
-#. First, ``git checkout master`` illustrates a trivial multi-service app with cross-service tracing via OpenTracing
+#. First, ``git checkout master`` illustrates a trivial multi-service app with cross-service tracing via OpenTelemetry
 #. Second, ``git checkout no-tracing`` removes the tracing instrumentation, allowing the reader to add it in themselves
 
 Step 0: Setup MicroDonuts
@@ -29,7 +29,7 @@ Getting it
 Running
 -------
 
-#. ``pyhton3 python-opentelemetry-walkthrough/walkthrough/server.py``
+#. ``python3 python-opentelemetry-walkthrough/walkthrough/server.py``
 #. Open your web browser, navigate to ``http://127.0.0.1:8082`` and order yourself some µ-donuts.
 
 MicroDonuts has 4 server endpoints:
@@ -59,7 +59,7 @@ Step 2: Turnkey Tracing
 -----------------------
 
 When you go to add tracing to a system, the best place to start is by
-installing OpenTracing plugins for the OSS components you are using.
+installing OpenTelemetry plugins for the OSS components you are using.
 Instrumenting your networking libraries, web frameworks, and service clients
 quickly gives you a lot of information about your distributed system, without
 requiring you to change a lot of code.
@@ -70,7 +70,7 @@ To do this, let's change the startup of the application to include tracing:
 Start the global tracer
 .......................
 
-In OpenTracing, there is a concept of a global tracer for everyone to access.
+In OpenTelemetry, there is a concept of a global tracer for everyone to access.
 
 Accessing this global tracer is easy, just add these lines to ``server.py`` under
 ``BLOCK 0``:
