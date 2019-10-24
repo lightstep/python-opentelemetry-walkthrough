@@ -3,19 +3,34 @@ from uuid import uuid4
 
 from flask import Flask, request, render_template
 
-# BLOCK 0
+from opentelemetry import trace, propagators
+from opentelemetry.sdk.trace import Tracer
+from opentelemetry.sdk.context.propagation.b3_format import B3Format
+from opentelemetry.ext.http_requests import enable
+from opentelemetry.ext.wsgi import OpenTelemetryMiddleware
+from opentelemetry.sdk.trace.export import ConsoleSpanExporter
+from opentelemetry.sdk.trace.export import SimpleExportSpanProcessor
 
 from kitchen_service import KitchenService
 from kitchen_consumer import KitchenConsumer
 from donut import Donut
 from status import NEW_ORDER
 
-# BLOCK 1
+
+trace.set_preferred_tracer_implementation(lambda T: Tracer())
+propagators.set_global_httptextformat(B3Format())
+tracer = trace.tracer()
+enable(tracer)
+
+tracer.add_span_processor(
+    SimpleExportSpanProcessor(ConsoleSpanExporter())
+)
 
 app = Flask(__name__)
 app.static_folder = 'static'
 
-# BLOCK 2
+app.wsgi_app = OpenTelemetryMiddleware(app.wsgi_app)
+
 
 kitchen_service = KitchenService()
 kitchen_consumer = KitchenConsumer()
@@ -32,21 +47,25 @@ def order():
 
     order_id = str(uuid4())
 
-    for donut_data in loads(next(request.form.keys()))['donuts']:
+    with tracer.start_span('root_span'):
 
-        for _ in range(donut_data['quantity']):
+        for donut_data in loads(next(request.form.keys()))['donuts']:
 
-            kitchen_consumer.add_donut(donut_data, order_id)
+            for _ in range(donut_data['quantity']):
 
-    return kitchen_consumer.check_status(order_id)
+                kitchen_consumer.add_donut(donut_data, order_id)
+
+        return kitchen_consumer.check_status(order_id)
 
 
 @app.route('/status', methods=['POST'])
 def status():
 
-    return kitchen_consumer.check_status(
-        loads(next(request.form.keys()))['order_id']
-    )
+    with tracer.start_span('status_span'):
+
+        return kitchen_consumer.check_status(
+            loads(next(request.form.keys()))['order_id']
+        )
 
 
 @app.route('/kitchen/add_donut', methods=['POST'])

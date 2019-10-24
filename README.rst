@@ -9,10 +9,12 @@ walkthrough, written in Python.
 OpenTelemetry is a vendor-neutral, open standard for distributed tracing. To
 learn more, check out http://opentelemetry.io, and try the walkthrough below!
 
-**Note that there are two git branches of note here.**
+There are two versions of the example app, ``walkthrough/server.py`` does not
+contain tracing while ``walkthrough/server_instrumented.py`` does.
 
-#. First, ``git checkout master`` illustrates a trivial multi-service app with cross-service tracing via OpenTelemetry
-#. Second, ``git checkout no-tracing`` removes the tracing instrumentation, allowing the reader to add it in themselves
+We encourage readers to follow this guide to add instrumentation to
+``walkthrough/server.py``.
+
 
 Step 0: Setup MicroDonuts
 =========================
@@ -29,7 +31,7 @@ Getting it
 Running
 -------
 
-#. ``python3 python-opentelemetry-walkthrough/walkthrough/server.py``
+#. ``python python-opentelemetry-walkthrough/walkthrough/server.py``
 #. Open your web browser, navigate to ``http://127.0.0.1:8082`` and order yourself some µ-donuts.
 
 MicroDonuts has 4 server endpoints:
@@ -41,22 +43,8 @@ MicroDonuts has 4 server endpoints:
 
 The first 2 serve orders, the last 2 provide kitchen services.
 
-Step 1: Check out the ``no-tracing`` branch
--------------------------------------------
-
-The ``master`` branch in this repository has tracing instrumentation added as
-described below. To maximize your learnings, do a...
-
-.. code:: bash
-
-    git checkout no-tracing
-
-...to start with a version of the code that's not instrumented yet. The guide
-below will let you learn-by-doing as you re-introduce that tracing
-instrumentation.
-
-Step 2: Turnkey Tracing
------------------------
+Step 1: Add Tracing
+===================
 
 When you go to add tracing to a system, the best place to start is by
 installing OpenTelemetry plugins for the OSS components you are using.
@@ -68,7 +56,7 @@ To do this, let's change the startup of the application to include tracing:
 ``cd python-opentelemetry-walkthrough/walkthrough``
 
 Start the global tracer
-.......................
+-----------------------
 
 In OpenTelemetry, there is a concept of a global tracer for everyone to access.
 
@@ -95,7 +83,7 @@ The global tracer is now available as ``tracer``.
 
 
 Instrument the HTTP requests
-............................
+----------------------------
 
 This is done in an automatic way by just adding this line under ``BLOCK 0``:
 
@@ -110,7 +98,7 @@ Add also this line under ``BLOCK 1``:
     enable(tracer)
 
 Instrument Flask
-................
+----------------
 
 This example uses Flask to expose the HTTP endpoints. Flask code can
 be traced automatically by adding this line under ``BLOCK 0``:
@@ -126,7 +114,7 @@ Add this line under ``BLOCK 2`` also:
     app.wsgi_app = OpenTelemetryMiddleware(app.wsgi_app)
 
 Add an exporter
-...............
+---------------
 
 An exporter is necessary for the span data to be displayed. We'll use the
 ``ConsoleExporter`` in this example, an exporter that simply prints the span data
@@ -146,7 +134,7 @@ Add this line under ``BLOCK 1``:
     )
 
 Use the tracer
-..............
+--------------
 
 Now is time to use the tracer itself in the server code.
 
@@ -185,8 +173,8 @@ Change the ``status`` function to this:
 This will automatically create a span every time each of these functions are
 called.
 
-Step 3: Have fun
-----------------
+Step 2: Have Fun
+================
 
 You can run the walkthrough again as explained before. You should see the span
 data displayed in the console.
