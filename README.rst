@@ -12,9 +12,12 @@ learn more, check out http://opentelemetry.io, and try the walkthrough below!
 There are two versions of the example app, ``walkthrough/server.py`` does not
 contain tracing while ``walkthrough/server_instrumented.py`` does.
 
-We encourage readers to follow this guide to add instrumentation to
-``walkthrough/server.py``.
+This guide has two exclusive steps:
 
+- `Step 1, Alternative A: Add Tracing`_ shows how to manually add tracing information to an
+  application.
+- `Step 1, Alternative B: Use oteltrace-run`_ shows how to use oteltrace-run to autoinstrument
+  an application without adding tracing manually.
 
 Step 0: Setup MicroDonuts
 =========================
@@ -43,8 +46,8 @@ MicroDonuts has 4 server endpoints:
 
 The first 2 serve orders, the last 2 provide kitchen services.
 
-Step 1: Add Tracing
-===================
+Step 1, Alternative A: Add Tracing
+==================================
 
 When you go to add tracing to a system, the best place to start is by
 installing OpenTelemetry plugins for the OSS components you are using.
@@ -172,6 +175,43 @@ Change the ``status`` function to this:
 
 This will automatically create a span every time each of these functions are
 called.
+
+Step 1, Alternative B: Use oteltrace-run
+========================================
+
+``otel-trace`` allows to automatically instrument applications written in python.
+
+Installation
+------------
+
+oteltrace-py doesn't have a PyPI packet yet, it has to be installed from source:
+
+::
+
+    # install oteltrace-py (will install opentelemetry as well)
+    git clone https://github.com/lightstep/otel-trace-py -b mauricio/clean_code
+    cd otel-trace-py
+    pip install -e .
+
+Running
+-------
+
+Before running the application, the console exporter has to be configured as the
+exporter.
+
+::
+
+    # module where the opentelemetry SDK exporter is implemented
+    export OTEL_EXPORTER_MODULE=opentelemetry.sdk.trace.export
+    # factory function that returns an instance of the exporter
+    # (constructor in this case)
+    export OTEL_EXPORTER_FACTORY=ConsoleSpanExporter
+
+Now you can run the microdonuts application:
+
+::
+
+    oteltrace-run python python-opentelemetry-walkthrough/walkthrough/server.py
 
 Step 2: Have Fun
 ================
