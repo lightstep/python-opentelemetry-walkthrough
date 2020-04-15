@@ -3,8 +3,7 @@ from uuid import uuid4
 
 from opentelemetry import trace
 from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.http_requests import enable
-from opentelemetry.ext.flask import FlaskInstrumentor
+from opentelemetry.ext.http_requests import enable
 from opentelemetry.sdk.trace.export import ConsoleSpanExporter
 from opentelemetry.sdk.trace.export import SimpleExportSpanProcessor
 
@@ -13,7 +12,6 @@ from kitchen_consumer import KitchenConsumer
 from donut import Donut
 from status import NEW_ORDER
 
-FlaskInstrumentor().instrument()
 from flask import Flask, render_template, request
 
 app = Flask(__name__)
@@ -25,7 +23,7 @@ trace.get_tracer_provider().add_span_processor(
 )
 
 tracer = trace.get_tracer(__name__)
-enable(tracer)
+enable(trace.get_tracer_provider())
 
 
 kitchen_service = KitchenService()

@@ -28,7 +28,7 @@ Getting it
 #. Install ``virtualenv``: ``sudo -H pip3 install virtualenv``
 #. Create a virtual environment: ``mkdir microdonuts; virtualenv microdonuts``
 #. Activate the virtual environment: ``source microdonuts/bin/activate``
-#. Clone this repository
+#. Clone this repository: ``git clone git@github.com:lightstep/python-opentelemetry-walkthrough.git``
 #. Install the dependencies ``pip3 install -r python-opentelemetry-walkthrough/requirements.txt``
 
 Running
@@ -175,39 +175,26 @@ called.
 Step 1, Alternative B: Use oteltrace-run
 ========================================
 
-``otel-trace`` allows to automatically instrument applications written in python.
+``opentelemetry-auto-instrumentation`` allows to automatically instrument
+applications written in Python.
 
 Installation
 ------------
 
-oteltrace-py doesn't have a PyPI packet yet, it has to be installed from source:
-
-::
-
-    # install oteltrace-py (will install opentelemetry as well)
-    git clone https://github.com/lightstep/otel-trace-py -b mauricio/clean_code
-    cd otel-trace-py
-    pip install -e .
+The ``opentelemetry-auto-instrumentation`` package can be installed directly
+from PyPi. It is already provided in the ``requirements.txt`` file so no more
+installation is needed.
 
 Running
 -------
 
-Before running the application, the console exporter has to be configured as the
-exporter.
+You can run the microdonuts application without any Flask instrumentation code.
+The ``server_instrumented.py`` file already provides this code ready to be
+exceuted. Notice how this file lacks any call to ``FlaskInstrumentor``.
 
 ::
 
-    # module where the opentelemetry SDK exporter is implemented
-    export OTEL_EXPORTER_MODULE=opentelemetry.sdk.trace.export
-    # factory function that returns an instance of the exporter
-    # (constructor in this case)
-    export OTEL_EXPORTER_FACTORY=ConsoleSpanExporter
-
-Now you can run the microdonuts application:
-
-::
-
-    oteltrace-run python python-opentelemetry-walkthrough/walkthrough/server.py
+    opentelemetry-auto-instrumentation python python-opentelemetry-walkthrough/walkthrough/server_instrumented.py
 
 Step 2: Have Fun
 ================
