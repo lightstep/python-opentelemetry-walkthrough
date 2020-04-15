@@ -63,24 +63,19 @@ Start the global tracer
 
 In OpenTelemetry, there is a concept of a global tracer for everyone to access.
 
-Accessing this global tracer is easy, just add these lines to ``server.py`` under
-``BLOCK 0``:
+Accessing this global tracer is easy, just add these lines to ``server.py``
+under ``BLOCK 0``:
 
 .. code:: python
 
-    from opentelemetry import trace, propagators
-    from opentelemetry.sdk.trace import Tracer
-    from opentelemetry.sdk.context.propagation.b3_format import B3Format
+    from opentelemetry import trace
+    from opentelemetry.sdk.trace import TracerProvider
 
-Add these lines under ``BLOCK 1`` too:
+Add these lines under ``BLOCK 2`` too:
 
 .. code:: python
 
-    trace.set_preferred_tracer_implementation(lambda T: Tracer())
-
-    propagators.set_global_httptextformat(B3Format())
-
-    tracer = trace.tracer()
+    tracer = trace.get_tracer(__name__)
 
 The global tracer is now available as ``tracer``.
 
@@ -92,9 +87,9 @@ This is done in an automatic way by just adding this line under ``BLOCK 0``:
 
 .. code:: python
 
-    from opentelemetry.ext.http_requests import enable
+    from opentelemetry.http_requests import enable
 
-Add also this line under ``BLOCK 1``:
+Add also this line under ``BLOCK 2``:
 
 .. code:: python
 
@@ -108,13 +103,13 @@ be traced automatically by adding this line under ``BLOCK 0``:
 
 .. code:: python
 
-    from opentelemetry.ext.wsgi import OpenTelemetryMiddleware
+    from opentelemetry.ext.flask import FlaskInstrumentor
 
-Add this line under ``BLOCK 2`` also:
+Add this line under ``BLOCK 1`` also:
 
 .. code:: python
 
-    app.wsgi_app = OpenTelemetryMiddleware(app.wsgi_app)
+    FlaskInstrumentor().instrument()
 
 Add an exporter
 ---------------
@@ -128,11 +123,12 @@ into the console. Add these lines under ``BLOCK 0``:
     from opentelemetry.sdk.trace.export import ConsoleSpanExporter
     from opentelemetry.sdk.trace.export import SimpleExportSpanProcessor
 
-Add this line under ``BLOCK 1``:
+Add these lines under ``BLOCK 2``:
 
 .. code:: python
 
-    tracer.add_span_processor(
+    trace.set_tracer_provider(TracerProvider())
+    trace.get_tracer_provider().add_span_processor(
         SimpleExportSpanProcessor(ConsoleSpanExporter())
     )
 

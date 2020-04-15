@@ -1,8 +1,6 @@
 from json import loads, dumps
 from uuid import uuid4
 
-from flask import Flask, request, render_template
-
 # BLOCK 0
 
 from kitchen_service import KitchenService
@@ -11,6 +9,7 @@ from donut import Donut
 from status import NEW_ORDER
 
 # BLOCK 1
+from flask import Flask, request, render_template
 
 app = Flask(__name__)
 app.static_folder = 'static'

@@ -1,13 +1,10 @@
 from json import loads, dumps
 from uuid import uuid4
 
-from flask import Flask, request, render_template
-
-from opentelemetry import trace, propagators
-from opentelemetry.sdk.trace import Tracer
-from opentelemetry.sdk.context.propagation.b3_format import B3Format
-from opentelemetry.ext.http_requests import enable
-from opentelemetry.ext.wsgi import OpenTelemetryMiddleware
+from opentelemetry import trace
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.http_requests import enable
+from opentelemetry.ext.flask import FlaskInstrumentor
 from opentelemetry.sdk.trace.export import ConsoleSpanExporter
 from opentelemetry.sdk.trace.export import SimpleExportSpanProcessor
 
@@ -16,20 +13,19 @@ from kitchen_consumer import KitchenConsumer
 from donut import Donut
 from status import NEW_ORDER
 
-
-trace.set_preferred_tracer_implementation(lambda T: Tracer())
-propagators.set_global_httptextformat(B3Format())
-tracer = trace.tracer()
-enable(tracer)
-
-tracer.add_span_processor(
-    SimpleExportSpanProcessor(ConsoleSpanExporter())
-)
+FlaskInstrumentor().instrument()
+from flask import Flask, render_template, request
 
 app = Flask(__name__)
 app.static_folder = 'static'
 
-app.wsgi_app = OpenTelemetryMiddleware(app.wsgi_app)
+trace.set_tracer_provider(TracerProvider())
+trace.get_tracer_provider().add_span_processor(
+    SimpleExportSpanProcessor(ConsoleSpanExporter())
+)
+
+tracer = trace.get_tracer(__name__)
+enable(tracer)
 
 
 kitchen_service = KitchenService()
