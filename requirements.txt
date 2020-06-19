@@ -1,5 +1,7 @@
 flask
-opentelemetry-api
-opentelemetry-sdk
-opentelemetry-ext-http-requests
-opentelemetry-ext-wsgi
+-e git+git@github.com:ocelotl/opentelemetry-python.git@f4476b20b356afcffa538587960cdc81b4516b37#egg=opentelemetry_api&subdirectory=opentelemetry-api
+-e git+git@github.com:ocelotl/opentelemetry-python.git@f4476b20b356afcffa538587960cdc81b4516b37#egg=opentelemetry_auto_instrumentation&subdirectory=opentelemetry-auto-instrumentation
+-e git+git@github.com:ocelotl/opentelemetry-python.git@f4476b20b356afcffa538587960cdc81b4516b37#egg=opentelemetry_ext_flask&subdirectory=ext/opentelemetry-ext-flask
+-e git+git@github.com:ocelotl/opentelemetry-python.git@f4476b20b356afcffa538587960cdc81b4516b37#egg=opentelemetry_ext_http_requests&subdirectory=ext/opentelemetry-ext-http-requests
+-e git+git@github.com:ocelotl/opentelemetry-python.git@f4476b20b356afcffa538587960cdc81b4516b37#egg=opentelemetry_ext_wsgi&subdirectory=ext/opentelemetry-ext-wsgi
+-e git+git@github.com:ocelotl/opentelemetry-python.git@f4476b20b356afcffa538587960cdc81b4516b37#egg=opentelemetry_sdk&subdirectory=opentelemetry-sdk
