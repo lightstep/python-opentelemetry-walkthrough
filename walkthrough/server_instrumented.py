@@ -4,10 +4,10 @@ from uuid import uuid4
 from flask import Flask, request, render_template
 
 from opentelemetry import trace, propagators
-from opentelemetry.sdk.trace import Tracer
-from opentelemetry.sdk.context.propagation.b3_format import B3Format
-from opentelemetry.ext.http_requests import enable
-from opentelemetry.ext.wsgi import OpenTelemetryMiddleware
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.propagation.b3_format import B3Format
+from opentelemetry.ext.requests import RequestsInstrumentor
+from opentelemetry.ext.flask import FlaskInstrumentor
 from opentelemetry.sdk.trace.export import ConsoleSpanExporter
 from opentelemetry.sdk.trace.export import SimpleExportSpanProcessor
 
@@ -17,19 +17,17 @@ from donut import Donut
 from status import NEW_ORDER
 
 
-trace.set_preferred_tracer_implementation(lambda T: Tracer())
+
+trace.set_tracer_provider(TracerProvider())
 propagators.set_global_httptextformat(B3Format())
-tracer = trace.tracer()
-enable(tracer)
-
-tracer.add_span_processor(
-    SimpleExportSpanProcessor(ConsoleSpanExporter())
-)
-
+tracer = trace.get_tracer(__name__)
+span_processor = SimpleExportSpanProcessor(ConsoleSpanExporter())
+trace.get_tracer_provider().add_span_processor(span_processor)
 app = Flask(__name__)
 app.static_folder = 'static'
 
-app.wsgi_app = OpenTelemetryMiddleware(app.wsgi_app)
+RequestsInstrumentor().instrument()
+FlaskInstrumentor().instrument_app(app)
 
 
 kitchen_service = KitchenService()
@@ -62,7 +60,7 @@ def order():
 def status():
 
     with tracer.start_span('status_span'):
-
+        
         return kitchen_consumer.check_status(
             loads(next(request.form.keys()))['order_id']
         )
