@@ -1,9 +1,13 @@
 from json import loads, dumps
 from uuid import uuid4
 
-from opentelemetry import trace
+from flask import Flask, request, render_template
+
+from opentelemetry import trace, propagators
 from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.ext.http_requests import enable
+from opentelemetry.sdk.trace.propagation.b3_format import B3Format
+from opentelemetry.ext.requests import RequestsInstrumentor
+from opentelemetry.ext.flask import FlaskInstrumentor
 from opentelemetry.sdk.trace.export import ConsoleSpanExporter
 from opentelemetry.sdk.trace.export import SimpleExportSpanProcessor
 
@@ -14,17 +18,17 @@ from status import NEW_ORDER
 
 from flask import Flask, render_template, request
 
+
+trace.set_tracer_provider(TracerProvider())
+propagators.set_global_httptextformat(B3Format())
+tracer = trace.get_tracer(__name__)
+span_processor = SimpleExportSpanProcessor(ConsoleSpanExporter())
+trace.get_tracer_provider().add_span_processor(span_processor)
 app = Flask(__name__)
 app.static_folder = 'static'
 
-trace.set_tracer_provider(TracerProvider())
-trace.get_tracer_provider().add_span_processor(
-    SimpleExportSpanProcessor(ConsoleSpanExporter())
-)
-
-tracer = trace.get_tracer(__name__)
-enable(trace.get_tracer_provider())
-
+RequestsInstrumentor().instrument()
+FlaskInstrumentor().instrument_app(app)
 
 kitchen_service = KitchenService()
 kitchen_consumer = KitchenConsumer()
@@ -56,7 +60,7 @@ def order():
 def status():
 
     with tracer.start_span('status_span'):
-
+        
         return kitchen_consumer.check_status(
             loads(next(request.form.keys()))['order_id']
         )

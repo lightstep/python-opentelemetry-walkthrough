@@ -68,12 +68,17 @@ under ``BLOCK 0``:
 
 .. code:: python
 
-    from opentelemetry import trace
+    from opentelemetry import trace, propagators
     from opentelemetry.sdk.trace import TracerProvider
+    from opentelemetry.sdk.trace.propagation.b3_format import B3Format
 
 Add these lines under ``BLOCK 2`` too:
 
 .. code:: python
+
+    trace.set_tracer_provider(TracerProvider())
+
+    propagators.set_global_httptextformat(B3Format())
 
     tracer = trace.get_tracer(__name__)
 
@@ -87,13 +92,13 @@ This is done in an automatic way by just adding this line under ``BLOCK 0``:
 
 .. code:: python
 
-    from opentelemetry.http_requests import enable
+    from opentelemetry.ext.requests import RequestsInstrumentor
 
 Add also this line under ``BLOCK 2``:
 
 .. code:: python
 
-    enable(tracer)
+    RequestsInstrumentor().instrument()
 
 Instrument Flask
 ----------------
@@ -109,7 +114,7 @@ Add this line under ``BLOCK 1`` also:
 
 .. code:: python
 
-    FlaskInstrumentor().instrument()
+    FlaskInstrumentor().instrument_app(app)
 
 Add an exporter
 ---------------
@@ -127,7 +132,6 @@ Add these lines under ``BLOCK 2``:
 
 .. code:: python
 
-    trace.set_tracer_provider(TracerProvider())
     trace.get_tracer_provider().add_span_processor(
         SimpleExportSpanProcessor(ConsoleSpanExporter())
     )
