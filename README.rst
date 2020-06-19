@@ -28,7 +28,7 @@ Getting it
 #. Install ``virtualenv``: ``sudo -H pip3 install virtualenv``
 #. Create a virtual environment: ``mkdir microdonuts; virtualenv microdonuts``
 #. Activate the virtual environment: ``source microdonuts/bin/activate``
-#. Clone this repository
+#. Clone this repository: ``git clone git@github.com:lightstep/python-opentelemetry-walkthrough.git``
 #. Install the dependencies ``pip3 install -r python-opentelemetry-walkthrough/requirements.txt``
 
 Running
@@ -69,18 +69,18 @@ Accessing this global tracer is easy, just add these lines to ``server.py`` unde
 .. code:: python
 
     from opentelemetry import trace, propagators
-    from opentelemetry.sdk.trace import Tracer
-    from opentelemetry.sdk.context.propagation.b3_format import B3Format
+    from opentelemetry.sdk.trace import TracerProvider
+    from opentelemetry.sdk.trace.propagation.b3_format import B3Format
 
 Add these lines under ``BLOCK 1`` too:
 
 .. code:: python
 
-    trace.set_preferred_tracer_implementation(lambda T: Tracer())
+    trace.set_tracer_provider(TracerProvider())
 
     propagators.set_global_httptextformat(B3Format())
 
-    tracer = trace.tracer()
+    tracer = trace.get_tracer(__name__)
 
 The global tracer is now available as ``tracer``.
 
@@ -92,13 +92,13 @@ This is done in an automatic way by just adding this line under ``BLOCK 0``:
 
 .. code:: python
 
-    from opentelemetry.ext.http_requests import enable
+    from opentelemetry.ext.requests import RequestsInstrumentor
 
 Add also this line under ``BLOCK 1``:
 
 .. code:: python
 
-    enable(tracer)
+    RequestsInstrumentor().instrument()
 
 Instrument Flask
 ----------------
@@ -108,13 +108,13 @@ be traced automatically by adding this line under ``BLOCK 0``:
 
 .. code:: python
 
-    from opentelemetry.ext.wsgi import OpenTelemetryMiddleware
+    from opentelemetry.ext.flask import FlaskInstrumentor
 
-Add this line under ``BLOCK 2`` also:
+Add this line under ``BLOCK 1`` also:
 
 .. code:: python
 
-    app.wsgi_app = OpenTelemetryMiddleware(app.wsgi_app)
+    FlaskInstrumentor().instrument_app(app)
 
 Add an exporter
 ---------------
@@ -132,7 +132,7 @@ Add this line under ``BLOCK 1``:
 
 .. code:: python
 
-    tracer.add_span_processor(
+    trace.get_tracer_provider().add_span_processor(
         SimpleExportSpanProcessor(ConsoleSpanExporter())
     )
 
