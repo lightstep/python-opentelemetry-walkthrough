@@ -16,6 +16,7 @@ from kitchen_consumer import KitchenConsumer
 from donut import Donut
 from status import NEW_ORDER
 
+from flask import Flask, render_template, request
 
 
 trace.set_tracer_provider(TracerProvider())
@@ -28,7 +29,6 @@ app.static_folder = 'static'
 
 RequestsInstrumentor().instrument()
 FlaskInstrumentor().instrument_app(app)
-
 
 kitchen_service = KitchenService()
 kitchen_consumer = KitchenConsumer()
