@@ -16,7 +16,7 @@ This guide has two exclusive steps:
 
 - `Step 1, Alternative A: Add Tracing`_ shows how to manually add tracing information to an
   application.
-- `Step 1, Alternative B: Use oteltrace-run`_ shows how to use oteltrace-run to autoinstrument
+- `Step 1, Alternative B: Use opentelemetry-instrumentation`_ shows how to use opentelemetry-instrumentation to autoinstrument
   an application without adding tracing manually.
 
 Step 0: Setup MicroDonuts
@@ -57,6 +57,11 @@ requiring you to change a lot of code.
 
 To do this, let's change the startup of the application to include tracing:
 ``cd python-opentelemetry-walkthrough/walkthrough``
+
+You can also run the already instrumented version of microdonuts:
+
+::
+    python python-opentelemetry-walkthrough/walkthrough/server.py
 
 Start the global tracer
 -----------------------
@@ -176,29 +181,50 @@ Change the ``status`` function to this:
 This will automatically create a span every time each of these functions are
 called.
 
-Step 1, Alternative B: Use oteltrace-run
+Step 1, Alternative B: Use opentelemetry-instrumentation
 ========================================
 
-``opentelemetry-auto-instrumentation`` allows to automatically instrument
+``opentelemetry-instrumentation`` allows to automatically instrument
 applications written in Python.
 
 Installation
 ------------
 
-The ``opentelemetry-auto-instrumentation`` package can be installed directly
+The ``opentelemetry-instrumentation`` package can be installed directly
 from PyPi. It is already provided in the ``requirements.txt`` file so no more
 installation is needed.
+
+Configure OpenTelemetry
+-----------------------
+
+Add these lines to ``server.py`` under ``BLOCK 0``:
+
+.. code:: python
+
+    from opentelemetry import trace
+    from opentelemetry.sdk.trace.export import ConsoleSpanExporter
+    from opentelemetry.sdk.trace.export import SimpleExportSpanProcessor
+
+Then add these lines under ``BLOCK 1``:
+
+.. code:: python
+
+    tracer = trace.get_tracer(__name__)
+    span_processor = SimpleExportSpanProcessor(ConsoleSpanExporter())
+    trace.get_tracer_provider().add_span_processor(span_processor)
+
 
 Running
 -------
 
-You can run the microdonuts application without any Flask instrumentation code.
-The ``server_instrumented.py`` file already provides this code ready to be
-exceuted. Notice how this file lacks any call to ``FlaskInstrumentor``.
+The opentelemetry-instrument script loads all installed instrumentation libraries before your application runs,
+giving it a chance to instrument any calls to supported libraries.
+Start the application:
 
 ::
 
-    opentelemetry-auto-instrumentation python python-opentelemetry-walkthrough/walkthrough/server_instrumented.py
+    export OPENTELEMETRY_PYTHON_tracer_provider=sdk_tracer_provider
+    opentelemetry-instrument python python-opentelemetry-walkthrough/walkthrough/server.py
 
 Step 2: Have Fun
 ================
