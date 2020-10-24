@@ -1,7 +1,10 @@
+=====================================================================================================================
+This is example is now deprecated.  For up to date examples, see https://github.com/lightstep/opentelemetry-examples.
+=====================================================================================================================
+
 =========================================
 MicroDonuts: An OpenTelemetry Walkthrough
 =========================================
-
 
 Welcome to MicroDonuts! This is a sample application and OpenTelemetry
 walkthrough, written in Python.
